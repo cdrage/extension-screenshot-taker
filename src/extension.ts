@@ -115,7 +115,9 @@ export async function activate(extensionContext: extensionApi.ExtensionContext):
     extensionApi.StatusBarAlignLeft,
     -100,
   );
-  statusBarItem.text = 'Screenshots';
+
+  // Leave title blank so it doesn't take up space
+  statusBarItem.text = '';
   statusBarItem.tooltip = 'Capture screenshots in all 4 themes (dark, light, hc-dark, hc-light)';
   statusBarItem.iconClass = 'fa fa-camera';
   statusBarItem.command = 'screenshot.captureAllThemes';
