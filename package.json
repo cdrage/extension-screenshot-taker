@@ -1,0 +1,40 @@
+{
+  "name": "screenshot-themes",
+  "displayName": "Screenshot Themes",
+  "description": "Capture Podman Desktop screenshots in all color themes (dark, light, hc-dark, hc-light)",
+  "version": "0.0.1",
+  "icon": "icon.png",
+  "publisher": "cdrage",
+  "license": "Apache-2.0",
+  "engines": {
+    "podman-desktop": ">=1.10.0"
+  },
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "screenshot.captureAllThemes",
+        "title": "Capture Screenshots in All Themes"
+      }
+    ],
+    "configuration": {
+      "title": "Screenshot Themes",
+      "properties": {
+        "screenshot-themes.outputFolder": {
+          "type": "string",
+          "default": "",
+          "description": "Folder where screenshots are saved. If empty, you will be prompted on first use."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "@podman-desktop/api": "1.27.2",
+    "@types/node": "^22",
+    "typescript": "6.0.3"
+  }
+}
