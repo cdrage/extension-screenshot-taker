@@ -95,9 +95,8 @@ async function captureAllThemes(): Promise<void> {
       await config.update('appearance', originalTheme);
       setNativeTheme(originalTheme);
 
-      await extensionApi.window.showInformationMessage(
-        `Screenshots saved to ${outputDir}`,
-      );
+      progress.report({ message: 'Screenshots saved' });
+      await delay(5000);
     },
   );
 }
