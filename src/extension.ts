@@ -75,7 +75,7 @@ async function captureAllThemes(): Promise<void> {
 
         await config.update('appearance', theme);
         setNativeTheme(theme);
-        await delay(3000);
+        await delay(1000);
 
         const outputPath = path.join(outputDir, `${timestamp}-screenshot-${theme}.png`);
         try {
