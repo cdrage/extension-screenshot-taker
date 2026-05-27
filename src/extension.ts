@@ -67,6 +67,10 @@ async function captureAllThemes(): Promise<void> {
   const config = extensionApi.configuration.getConfiguration('preferences');
   const originalTheme = config.get<string>('appearance') ?? 'system';
 
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { BrowserWindow, nativeTheme } = require('electron');
+  const originalNativeTheme: string = nativeTheme.themeSource;
+
   await extensionApi.window.withProgress(
     { location: extensionApi.ProgressLocation.TASK_WIDGET, title: 'Capturing theme screenshots' },
     async progress => {
@@ -93,7 +97,11 @@ async function captureAllThemes(): Promise<void> {
 
       progress.report({ message: 'Restoring original theme...' });
       await config.update('appearance', originalTheme);
-      setNativeTheme(originalTheme);
+      nativeTheme.themeSource = originalNativeTheme;
+      // Notify the renderer to re-apply colors for custom themes
+      const windows = BrowserWindow.getAllWindows();
+      windows[0]?.webContents.send('api-sender', 'color-updated');
+      await delay(1000);
 
       progress.report({ message: 'Screenshots saved' });
       await delay(5000);
