@@ -100,10 +100,9 @@ async function captureAllThemes(): Promise<void> {
   await delay(1000);
 
   await extensionApi.window.withProgress(
-    { location: extensionApi.ProgressLocation.TASK_WIDGET, title: 'Screenshots saved' },
-    async progress => {
-      progress.report({ message: `Captured all themes to ${outputDir}` });
-      await delay(5000);
+    { location: extensionApi.ProgressLocation.TASK_WIDGET, title: 'Saved screenshots' },
+    async () => {
+      await delay(2000);
     },
   );
 }
