@@ -71,39 +71,34 @@ async function captureAllThemes(): Promise<void> {
   const { BrowserWindow, nativeTheme } = require('electron');
   const originalNativeTheme: string = nativeTheme.themeSource;
 
+  for (const theme of THEMES) {
+    await config.update('appearance', theme);
+    setNativeTheme(theme);
+    await delay(1000);
+
+    const outputPath = path.join(outputDir, `${timestamp}-screenshot-${theme}.png`);
+    try {
+      await takeScreenshot(outputPath);
+    } catch (err) {
+      console.error(`Failed to capture ${theme} screenshot:`, err);
+      await extensionApi.window.showErrorMessage(
+        `Failed to capture ${theme} screenshot: ${String(err)}`,
+      );
+    }
+
+    await delay(500);
+  }
+
+  await config.update('appearance', originalTheme);
+  nativeTheme.themeSource = originalNativeTheme;
+  const windows = BrowserWindow.getAllWindows();
+  windows[0]?.webContents.send('api-sender', 'color-updated');
+  await delay(1000);
+
   await extensionApi.window.withProgress(
-    { location: extensionApi.ProgressLocation.TASK_WIDGET, title: 'Capturing theme screenshots' },
+    { location: extensionApi.ProgressLocation.TASK_WIDGET, title: 'Screenshots saved' },
     async progress => {
-      for (const theme of THEMES) {
-        progress.report({ message: `Switching to ${theme}...` });
-
-        await config.update('appearance', theme);
-        setNativeTheme(theme);
-        await delay(1000);
-
-        const outputPath = path.join(outputDir, `${timestamp}-screenshot-${theme}.png`);
-        try {
-          await takeScreenshot(outputPath);
-          progress.report({ message: `Captured ${theme}` });
-        } catch (err) {
-          console.error(`Failed to capture ${theme} screenshot:`, err);
-          await extensionApi.window.showErrorMessage(
-            `Failed to capture ${theme} screenshot: ${String(err)}`,
-          );
-        }
-
-        await delay(500);
-      }
-
-      progress.report({ message: 'Restoring original theme...' });
-      await config.update('appearance', originalTheme);
-      nativeTheme.themeSource = originalNativeTheme;
-      // Notify the renderer to re-apply colors for custom themes
-      const windows = BrowserWindow.getAllWindows();
-      windows[0]?.webContents.send('api-sender', 'color-updated');
-      await delay(1000);
-
-      progress.report({ message: 'Screenshots saved' });
+      progress.report({ message: `Captured all themes to ${outputDir}` });
       await delay(5000);
     },
   );
