@@ -68,15 +68,19 @@ async function captureAllThemes(): Promise<void> {
   const originalTheme = config.get<string>('appearance') ?? 'system';
 
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { BrowserWindow, nativeTheme } = require('electron');
+  const { BrowserWindow, nativeTheme, screen } = require('electron');
   const originalNativeTheme: string = nativeTheme.themeSource;
+
+  const mainWindow = BrowserWindow.getAllWindows()[0];
+  const scaleFactor = mainWindow ? screen.getDisplayMatching(mainWindow.getBounds()).scaleFactor : 1;
+  const retinaSuffix = scaleFactor >= 2 ? `@${Math.floor(scaleFactor)}x` : '';
 
   for (const theme of THEMES) {
     await config.update('appearance', theme);
     setNativeTheme(theme);
     await delay(1000);
 
-    const outputPath = path.join(outputDir, `${timestamp}-screenshot-${theme}.png`);
+    const outputPath = path.join(outputDir, `${timestamp}-screenshot-${theme}${retinaSuffix}.png`);
     try {
       await takeScreenshot(outputPath);
     } catch (err) {
